@@ -2,6 +2,7 @@
   "expo": {
     "name": "rider",
     "slug": "rider",
+    "owner": "cado19",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,10 +22,16 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.cado19.rider"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "719c0269-780f-4484-ab7e-d80aa7c11396"
+      }
     }
   }
 }
