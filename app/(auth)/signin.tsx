@@ -25,7 +25,6 @@ export default function LoginScreen() {
       <EmailField value={email} onChangeText={setEmail} />
       <PasswordField value={password} onChangeText={setPassword} />
       <Button title="Log In" onPress={handleLogin} />
-      <GoogleSignInButton />
       <Text style={styles.link} onPress={() => router.push("signup")}>
         New here? Sign up →
       </Text>
