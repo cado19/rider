@@ -2,6 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import { supabase } from "../util/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Rider } from "../types/Rider";
 
 export async function loginandCacheProfile(email: string, password: string) {
   const {
@@ -20,3 +21,15 @@ export async function loginandCacheProfile(email: string, password: string) {
   await AsyncStorage.setItem("userProfile", JSON.stringify(profile));
   return { session, profile };
 }
+
+export const fetchRiderProfile = async (): Promise<Rider | null> => {
+  try {
+    const profileJson = await AsyncStorage.getItem("userProfile");
+    if(!profileJson) return null;
+    const profile = JSON.parse(profileJson)
+    return Array.isArray(profile) ? profile[0] : profile;
+  } catch (error) {
+    console.error("Failed to fetch rider profile: ", error);
+    return null;
+  }
+};
