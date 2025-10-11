@@ -6,11 +6,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "com.cado19.rider",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/8g.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/8g.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,7 +20,7 @@
     "android": {
       "config": {
         "googleMaps": {
-          "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
+          "apiKey": "AIzaSyByN6NuY1hIsiop6LmuEuBrsI463q4TnJw"
         }
       },
       "adaptiveIcon": {
@@ -38,7 +38,7 @@
       "eas": {
         "projectId": "719c0269-780f-4484-ab7e-d80aa7c11396"
       },
-      "googleMapsKey": "AIzaSyCPNh4_TYteA9Et6Cuf3VhF_5LkPJcZPoQ"
+      "googleMapsKey": "AIzaSyByN6NuY1hIsiop6LmuEuBrsI463q4TnJw"
     },
     "plugins": [
       "expo-router",
