@@ -12,18 +12,24 @@ import * as Location from "expo-location";
 import { supabase } from "../../util/supabase";
 import { fetchRiderProfile } from "../../services/auth";
 import { Coordinates } from "../../types/Coordinate";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
 import GooglePlacesTextInput from "react-native-google-places-textinput";
+import polyline from "@mapbox/polyline";
+
 // import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const screen = Dimensions.get("window");
 
 export default function trip_request() {
-  const [origin, setOrigin] = useState<Coordinates | null>(null);
-  const [destination, setDestination] = useState<Coordinates | null>(null);
+  const [origin, setOrigin] = useState<Coordinates | null>(null); // WHERE THE RIDER IS GETTING PICKED
+  const [destination, setDestination] = useState<Coordinates | null>(null); // WHERE THE RIDER IS GOING
   const [loading, setLoading] = useState(true);
+  const [routeCoords, setRouteCoords] = useState<Coordinates[]>([]);
+  const [distance, setDistance] = useState<string | null>(null);
+  const [duration, setDuration] = useState<string | null>(null);
   const mapRef = useRef(null);
 
+  // get the current location of the rider
   const detectLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     const profile = await fetchRiderProfile();
@@ -90,6 +96,76 @@ export default function trip_request() {
     }
   };
 
+  // decode polyline helper function. This helps to draw the linefrom origin to destination
+  const decodePolyline = (encoded: string): Coordinates[] => {
+    return polyline.decode(encoded).map(([lat, lng]) => ({
+      latitude: lat,
+      longitude: lng,
+    }));
+  };
+
+  // function to build route from steps if there is no polyline returned from google directions api
+  const buildRouteFromSteps = (steps: any[]): Coordinates[] => {
+    const allCoords: Coordinates[] = [];
+
+    steps.forEach((step) => {
+      const segment = polyline.decode(step.polyline.points);
+      const coords = segment.map(([lat, lng]) => ({
+        latitude: lat,
+        longitude: lng,
+      }));
+      allCoords.push(...coords);
+    });
+
+    return allCoords;
+  };
+
+  // fetch route from directions API
+  const fetchRoute = async () => {
+    // exit function if neither destination nor origin is set
+    if (!origin || !destination) {
+      return;
+    }
+
+    const originStr = `${origin.latitude},${origin.longitude}`;
+    const destStr = `${destination.latitude},${destination.longitude}`;
+
+    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB;
+    const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${originStr}&destination=${destStr}&key=${apiKey}`;
+    console.log("Url: ", url);
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      console.log("Directions API response:", JSON.stringify(data, null, 2));
+      // console.log("Data: ", data);
+
+      if (data.routes.length) {
+        const route = data.routes[0];
+        const leg = route.legs[0];
+
+        //use overview_polyline if available
+        const polylineStr = route.overview_polyline?.points;
+        const routePoints = polylineStr
+          ? decodePolyline(polylineStr)
+          : buildRouteFromSteps(leg.steps);
+
+        setRouteCoords(routePoints);
+
+        setDistance(leg.distance.text);
+        setDuration(leg.duration.text);
+      } else {
+        console.warn("No route found: ", data);
+        Alert.alert(
+          "Route Error",
+          "No route could be found between origin and destination."
+        );
+      }
+    } catch (error) {
+      console.error("Route fetch failed: ", error);
+    }
+  };
+
   useEffect(() => {
     detectLocation().finally(() => {
       setLoading(false);
@@ -98,6 +174,12 @@ export default function trip_request() {
 
   useEffect(() => {
     zoomMap();
+  }, [origin, destination]);
+
+  useEffect(() => {
+    if (origin && destination) {
+      fetchRoute();
+    }
   }, [origin, destination]);
 
   if (loading) {
@@ -130,7 +212,25 @@ export default function trip_request() {
               pinColor="blue"
             />
           )}
+          {routeCoords.length > 0 && (
+            <Polyline
+              coordinates={routeCoords}
+              strokeColor="#007AFF"
+              strokeWidth={4}
+            />
+          )}
         </MapView>
+      )}
+
+      {distance && duration && (
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoText}>Distance: {distance ?? "—"}</Text>
+          <Text style={styles.infoText}>Duration: {duration ?? "—"}</Text>
+
+          <View style={styles.buttonWrapper}>
+            <Text style={styles.requestButtonText}>Request Trip</Text>
+          </View>
+        </View>
       )}
 
       {/* Search Box  */}
@@ -183,5 +283,40 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "600",
+  },
+  infoContainer: {
+    marginTop: 20,
+    marginHorizontal: 20,
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 3,
+  },
+
+  infoText: {
+    fontSize: 20,
+    fontWeight: "500",
+    marginBottom: 10,
+    color: "#333",
+  },
+
+  buttonWrapper: {
+    marginTop: 20,
+    backgroundColor: "#007AFF",
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    elevation: 4,
+  },
+
+  requestButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
   },
 });
