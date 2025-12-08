@@ -11,11 +11,13 @@ import GoogleSignInButton from "../../components/GoogleSignInButton";
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
 
   const handleLogin = async () => {
     const { profile, session } = await loginandCacheProfile(email, password);
+    setSubmitting(true);
     router.replace("/(tabs)/home");
   };
 
@@ -24,7 +26,7 @@ export default function LoginScreen() {
       <Text style={styles.title}>🎉 Welcome Back!</Text>
       <EmailField value={email} onChangeText={setEmail} />
       <PasswordField value={password} onChangeText={setPassword} />
-      <Button title="Log In" onPress={handleLogin} />
+      <Button title={submitting ? "Logging in" : "Log In"} disabled={submitting} onPress={handleLogin} />
       <Text style={styles.link} onPress={() => router.push("signup")}>
         New here? Sign up →
       </Text>
