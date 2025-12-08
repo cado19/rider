@@ -5,6 +5,7 @@ import {
   Alert,
   StyleSheet,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -15,6 +16,7 @@ import { Coordinates } from "../../types/Coordinate";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import GooglePlacesTextInput from "react-native-google-places-textinput";
 import polyline from "@mapbox/polyline";
+import { router } from "expo-router";
 
 // import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
@@ -24,6 +26,7 @@ export default function trip_request() {
   const [origin, setOrigin] = useState<Coordinates | null>(null); // WHERE THE RIDER IS GETTING PICKED
   const [destination, setDestination] = useState<Coordinates | null>(null); // WHERE THE RIDER IS GOING
   const [loading, setLoading] = useState(true);
+  const [requesting, setRequesting] = useState(false); // for when a user submitting
   const [routeCoords, setRouteCoords] = useState<Coordinates[]>([]);
   const [distance, setDistance] = useState<string | null>(null);
   const [duration, setDuration] = useState<string | null>(null);
@@ -166,6 +169,58 @@ export default function trip_request() {
     }
   };
 
+  // function to request the trip
+  const requestTrip = async () => {
+    if (!origin || !destination || !distance || !duration) {
+      Alert.alert(
+        "Missing Info",
+        "Please select a destination and wait for route to load."
+      );
+      return;
+    }
+
+    setRequesting(true);
+
+    try {
+      const profile = await fetchRiderProfile();
+      const riderId = profile?.id;
+
+      const distanceKm = parseFloat(distance.replace(" km", ""));
+      const durationMin = parseFloat(
+        duration.replace(" mins", "").replace(" min", "")
+      );
+
+      const { data, error } = await supabase
+        .from("trip_requests")
+        .insert([
+          {
+            rider_id: riderId,
+            origin: `POINT(${origin.longitude} ${origin.latitude})`,
+            destination: `POINT(${destination.longitude} ${destination.latitude})`,
+            status: "pending",
+            distance_km: distanceKm,
+            estimated_time_min: durationMin,
+          },
+        ])
+        .select("id")
+        .single();
+
+      if (error) throw error;
+
+      router.push({
+        pathname: "(root)/trip_confirm",
+        params: {tripRequestId: data.id}
+      })
+
+      
+    } catch (err) {
+      console.error("Trip request failed:", err);
+      Alert.alert("Error", "Could not request trip. Please try again.");
+    } finally {
+      setRequesting(false);
+    }
+  };
+
   useEffect(() => {
     detectLocation().finally(() => {
       setLoading(false);
@@ -227,9 +282,9 @@ export default function trip_request() {
           <Text style={styles.infoText}>Distance: {distance ?? "—"}</Text>
           <Text style={styles.infoText}>Duration: {duration ?? "—"}</Text>
 
-          <View style={styles.buttonWrapper}>
+          <TouchableOpacity style={styles.buttonWrapper} onPress={requestTrip}>
             <Text style={styles.requestButtonText}>Request Trip</Text>
-          </View>
+          </TouchableOpacity>
         </View>
       )}
 
