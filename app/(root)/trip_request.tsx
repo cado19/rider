@@ -135,12 +135,12 @@ export default function trip_request() {
 
     const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB;
     const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${originStr}&destination=${destStr}&key=${apiKey}`;
-    console.log("Url: ", url);
+    // console.log("Url: ", url);
 
     try {
       const res = await fetch(url);
       const data = await res.json();
-      console.log("Directions API response:", JSON.stringify(data, null, 2));
+      // console.log("Directions API response:", JSON.stringify(data, null, 2));
       // console.log("Data: ", data);
 
       if (data.routes.length) {
