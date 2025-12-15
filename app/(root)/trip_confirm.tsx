@@ -9,10 +9,11 @@ import {
   Button,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { supabase } from "../../util/supabase";
 import Loader from "../../components/Loader";
 import MapView, { Marker, Polyline } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const screen = Dimensions.get("window");
 
@@ -26,6 +27,10 @@ export default function trip_confirm() {
 
   const [loading, setLoading] = useState(true); // Loading state for when component data is being fetched before mounting
   const [submitting, setSubmitting] = useState(false); // Loading state for confirm button is clicked.
+  const [searching, setSearching] = useState(false); // Loading state for searching for driver.
+  const [searchMessage, setSearchMessage] = useState(
+    "Searching for a driver..."
+  );
 
   const fetchTripData = async () => {
     try {
@@ -38,9 +43,12 @@ export default function trip_confirm() {
 
       // If RPC returns an array, pick the first element
       const tripRow = Array.isArray(trip) ? trip[0] : trip;
+      // console.log(tripRow);
 
       setTripRequest({
         ...tripRow,
+        origin: tripRow.origin,
+        destination: tripRow.destination,
         origin_lat: parseFloat(tripRow.origin_lat),
         origin_lon: parseFloat(tripRow.origin_lon),
         dest_lat: parseFloat(tripRow.dest_lat),
@@ -85,10 +93,11 @@ export default function trip_confirm() {
     }
 
     setSubmitting(true);
+    setSearching(true);
+    setSearchMessage("Searching for a driver...");
 
     try {
-      console.log(tripRequest?.id);
-      console.log("Type of tripRequest.id:", typeof tripRequest?.id);
+      // console.log(tripRequest);
 
       //1. update category in trip requests table for this trip
       await supabase
@@ -102,15 +111,13 @@ export default function trip_confirm() {
         .eq("id", tripRequest.id)
         .single();
 
-      console.log("Trip row before RPC:", tripRow, tripErr);
+      // console.log("Trip row before RPC:", tripRow, tripErr);
 
       // 2. Call RPC to find nearby driver
       const { data: driverMatch, error: driverError } = await supabase.rpc(
         "find_nearby_driver",
         { request_id: tripRequestId }
       );
-
-      console.log("Driver match data: ", driverMatch);
 
       if (driverError) {
         console.log("Driver error: ", driverError);
@@ -133,6 +140,8 @@ export default function trip_confirm() {
       const fare = calculateFare(selectedCategory?.base_rate ?? 0);
       const { error } = await supabase.from("trips").insert({
         rider_id: tripRequest.rider_id,
+        driver_id: matchRow.driver_id,
+        vehicle_id: matchRow.vehicle_id,
         origin: tripRequest.origin, // keep geography
         destination: tripRequest.destination,
         fare,
@@ -143,8 +152,31 @@ export default function trip_confirm() {
       if (error) throw error;
       // if (trip_update_error) throw trip_update_error;
 
-      // 4. Notify rider
-      Alert.alert("Trip confirmed", "Waiting for driver acceptance...");
+      setSearchMessage("Trip confirmed, Waiting for driver acceptance...");
+      // 4. Subscribe to trip updates
+      const tripSubscription = supabase
+        .channel("trip-status")
+        .on("postgres_changes", {
+          event: "UPDATE",
+          schema: "public",
+          table: "trips",
+          filter: `trip_request_id=eq.${tripRequest.id}`
+        }, (payload) => {
+          const updated = payload.new;
+          // console.log(updated);
+
+          if(updated.status === "accepted"){
+            setSearchMessage("Driver accepted your trip!");
+
+            setTimeout(() => {
+              tripSubscription.unsubscribe();
+              router.push({
+                pathname: "(root)/driver_details",
+                params: {tripId: updated.id}
+              })
+            }, 1500)
+          }
+        }).subscribe();
     } catch (error) {
       console.error(error);
       Alert.alert("Error", "Could not confirm trip");
@@ -154,7 +186,11 @@ export default function trip_confirm() {
   };
 
   if (loading || !tripRequest) {
-    return <Loader />;
+    return <Loader message="loading" />;
+  }
+
+  if (searching) {
+    return <Loader message={searchMessage} />;
   }
 
   // if (tripRequest) {
@@ -162,7 +198,7 @@ export default function trip_confirm() {
   // }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       {/* Map  */}
       {/* Show the map only if latitude and longitude coordinates of trip origin exist. This was for debugging purposes */}
       {tripRequest.origin_lat && tripRequest.origin_lon && (
@@ -235,7 +271,7 @@ export default function trip_confirm() {
           disabled={submitting}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
