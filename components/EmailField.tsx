@@ -15,31 +15,52 @@ const EmailField = ({
   onChangeText,
   placeholder,
 }: Props) => {
-  const { container, labelStyle, input } = styles;
+  const { wrapper, labelStyle, inputContainer, input } = styles;
   return (
-    <View style={container}>
+    <View style={wrapper}>
+      {/* Label  */}
       <Text style={labelStyle}>{label}</Text>
-      <TextInput
-        style={input}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder || "you@example.com"}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
+
+      {/* Input  */}
+      <View style={inputContainer}>
+        <TextInput
+          style={input}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder || "you@example.com"}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { marginVertical: 8 },
-  labelStyle: { fontWeight: "bold", marginBottom: 4 },
-  input: {
+  wrapper: {
+    marginVertical: 10,
+    width: "100%",
+  },
+  labelStyle: {
+    fontFamily: "JakartaSemiBold",
+    fontSize: 16,
+    marginBottom: 8,
+    color: "#111827",
+  },
+  inputContainer: {
+    backgroundColor: "#F3F4F6",
+    borderRadius: 50,
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 6,
+    borderColor: "#E5E7EB",
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
+  input: {
+    paddingVertical: 12,
+    fontSize: 15,
+    fontFamily: "JakartaMedium",
+    color: "#111827",
   },
 });
 

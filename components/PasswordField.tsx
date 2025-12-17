@@ -24,9 +24,12 @@ export default function PasswordField({
   const [secure, setSecure] = useState(true);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.wrapper}>
+      {/* Label  */}
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputWrapper}>
+
+      {/* Input Container  */}
+      <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           value={value}
@@ -35,6 +38,7 @@ export default function PasswordField({
           secureTextEntry={secure}
           autoCapitalize="none"
         />
+        {/* Show / Hide Toggle  */}
         <TouchableOpacity onPress={() => setSecure(!secure)}>
           <Text style={styles.toggle}>{secure ? "Show" : "Hide"}</Text>
         </TouchableOpacity>
@@ -44,23 +48,44 @@ export default function PasswordField({
 }
 
 const styles = StyleSheet.create({
-  container: { marginVertical: 8 },
-  label: { fontWeight: "bold", marginBottom: 4 },
-  inputWrapper: {
+  wrapper: {
+    marginVertical: 10,
+    width: "100%",
+  },
+
+  label: {
+    fontFamily: "JakartaSemiBold",
+    fontSize: 16,
+    marginBottom: 8,
+    color: "#111827",
+  },
+
+  inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#F3F4F6",
+    borderRadius: 50,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    paddingHorizontal: 10,
+    borderColor: "#E5E7EB",
+    paddingHorizontal: 16,
+    paddingVertical: 4,
   },
+
   input: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    fontSize: 15,
+    fontFamily: "JakartaMedium",
+    color: "#111827",
   },
+
   toggle: {
+    fontFamily: "JakartaSemiBold",
     color: "#007AFF",
-    fontWeight: "600",
-    padding: 8,
+    fontSize: 14,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
+
+
 });
