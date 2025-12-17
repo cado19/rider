@@ -7,6 +7,7 @@ import { loginandCacheProfile } from "../../services/auth";
 import EmailField from "../../components/EmailField";
 import PasswordField from "../../components/PasswordField";
 import GoogleSignInButton from "../../components/GoogleSignInButton";
+import PrimaryButton from "../../components/PrimaryButton";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -16,8 +17,8 @@ export default function LoginScreen() {
   const router = useRouter();
 
   const handleLogin = async () => {
-    const { profile, session } = await loginandCacheProfile(email, password);
     setSubmitting(true);
+    const { profile, session } = await loginandCacheProfile(email, password);
     router.replace("/(tabs)/home");
   };
 
@@ -26,7 +27,7 @@ export default function LoginScreen() {
       <Text style={styles.title}>🎉 Welcome Back!</Text>
       <EmailField value={email} onChangeText={setEmail} />
       <PasswordField value={password} onChangeText={setPassword} />
-      <Button title={submitting ? "Logging in" : "Log In"} disabled={submitting} onPress={handleLogin} />
+      <PrimaryButton title={submitting ? "Logging in": "Login"} onPress={handleLogin} disabled={submitting} />
       <Text style={styles.link} onPress={() => router.push("signup")}>
         New here? Sign up →
       </Text>
@@ -42,5 +43,5 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
-  link: { marginTop: 20, color: "#007AFF", textAlign: "center" },
+  link: { fontFamily: "JakartaSemiBold", marginTop: 20, color: "#007AFF", textAlign: "center" },
 });
