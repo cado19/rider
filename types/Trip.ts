@@ -4,6 +4,8 @@ export interface Trip {
   driver_id: string;
   origin: any; // or use PostGIS types if you’ve defined them
   destination: any;
+  originName: string;
+  destinationName: string;
   fare: number;
   status: string;
   started_at: string | null;
