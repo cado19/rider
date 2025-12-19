@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
+  SafeAreaView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -102,7 +103,7 @@ export default function Home() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <Text style={styles.greeting}>Hi {firstName}</Text>
 
       {/* Search Box  */}
@@ -138,7 +139,7 @@ export default function Home() {
           }
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
