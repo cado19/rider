@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "../../util/supabase";
 import { Trip } from "../../types/Trip";
 import TripCard from "../../components/TripCard";
+import Loader from "../../components/Loader";
 
 export default function Home() {
   const router = useRouter();
@@ -124,10 +125,7 @@ export default function Home() {
       <Text style={styles.sectionTitle}>Recent Rides</Text>
 
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#888"
-          style={{ marginTop: 20 }}
+        <Loader message="Loading recent trips"
         />
       ) : (
         <FlatList
