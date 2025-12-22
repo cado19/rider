@@ -17,6 +17,9 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import GooglePlacesTextInput from "react-native-google-places-textinput";
 import polyline from "@mapbox/polyline";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import PrimaryButton from "../../components/PrimaryButton";
+import Loader from "../../components/Loader";
 
 // import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
@@ -209,10 +212,8 @@ export default function trip_request() {
 
       router.push({
         pathname: "(root)/trip_confirm",
-        params: {tripRequestId: data.id}
-      })
-
-      
+        params: { tripRequestId: data.id },
+      });
     } catch (err) {
       console.error("Trip request failed:", err);
       Alert.alert("Error", "Could not request trip. Please try again.");
@@ -238,11 +239,7 @@ export default function trip_request() {
   }, [origin, destination]);
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+    return <Loader message="Loading..." />;
   }
   return (
     <View style={styles.container}>
@@ -277,23 +274,70 @@ export default function trip_request() {
         </MapView>
       )}
 
+      {/* Trip Info Card  */}
       {distance && duration && (
         <View style={styles.infoContainer}>
-          <Text style={styles.infoText}>Distance: {distance ?? "—"}</Text>
-          <Text style={styles.infoText}>Duration: {duration ?? "—"}</Text>
+          <View style={styles.infoRow}>
+            <Ionicons
+              name="car-outline"
+              size={20}
+              color="#007AFF"
+              style={styles.infoIcon}
+            />
+            <Text style={styles.infoText}>Distance: {distance ?? "—"}</Text>
+          </View>
 
-          <TouchableOpacity style={styles.buttonWrapper} onPress={requestTrip}>
-            <Text style={styles.requestButtonText}>Request Trip</Text>
-          </TouchableOpacity>
+          <View style={styles.infoRow}>
+            <Ionicons
+              name="time-outline"
+              size={20}
+              color="#007AFF"
+              style={styles.infoIcon}
+            />
+            <Text style={styles.infoText}>Duration: {duration ?? "—"}</Text>
+          </View>
+
+          <PrimaryButton
+            title={"Request trip"}
+            onPress={requestTrip}
+            variant="secondary"
+            style={{ padding: 16 }}
+          />
         </View>
       )}
 
       {/* Search Box  */}
       <View style={styles.searchBox}>
         <GooglePlacesTextInput
-          apiKey="AIzaSyByN6NuY1hIsiop6LmuEuBrsI463q4TnJw"
+          apiKey={process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB}
           placeHolderText="Where to"
           onPlaceSelect={handlePlaceSelect}
+          locationRestriction={{
+            rectangle: {
+              low: { latitude: -4.6785, longitude: 33.9098 }, // ✅ SW corner
+              high: { latitude: 4.62, longitude: 41.8996 }, // ✅ NE corner
+            },
+          }}
+          style={{
+            container: {
+              borderWidth: 0,
+              backgroundColor: "transparent",
+            },
+            input: {
+              borderWidth: 0,
+              backgroundColor: "transparent",
+              fontSize: 16,
+              paddingHorizontal: 12,
+            },
+            placeholder: {
+              color: "#9CA3AF",
+            },
+          }}
+          query={{
+            key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB,
+            language: "en",
+            components: "country:ke",
+          }}
         />
       </View>
     </View>
@@ -303,6 +347,7 @@ export default function trip_request() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F9FAFB",
   },
   loadingContainer: {
     justifyContent: "center",
@@ -319,9 +364,18 @@ const styles = StyleSheet.create({
     width: screen.width - 40,
     marginHorizontal: 20,
     zIndex: 10,
+    backgroundColor: "#FFF",
+    borderRadius: 50,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   textInput: {
     backgroundColor: "#fff",
+    // borderColor: "#FFF",
     borderRadius: 10,
     padding: 12,
     fontSize: 16,
@@ -340,23 +394,31 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   infoContainer: {
-    marginTop: 20,
+    marginTop: 10,
     marginHorizontal: 20,
     padding: 20,
     backgroundColor: "#fff",
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: "#ccc",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
     alignItems: "center",
     justifyContent: "center",
     elevation: 3,
   },
-
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  infoIcon: {
+    marginRight: 8,
+  },
   infoText: {
-    fontSize: 20,
-    fontWeight: "500",
-    marginBottom: 10,
-    color: "#333",
+    fontFamily: "JakartaMedium",
+    fontSize: 16,
+    color: "#111827",
   },
 
   buttonWrapper: {
