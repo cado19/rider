@@ -60,8 +60,8 @@ export default function driver_details() {
   };
 
   useEffect(() => {
-    if(tripId) fetchData();
-  }, [tripId])
+    if (tripId) fetchData();
+  }, [tripId]);
 
   //subscribe to driver live location
   useEffect(() => {
@@ -116,7 +116,7 @@ export default function driver_details() {
         (payload) => {
           const updated = payload.new;
 
-          setTrip(prev => ({...prev, status: updated.status}));
+          setTrip((prev) => ({ ...prev, status: updated.status }));
 
           if (updated.status === "arrived") {
             Alert.alert("Driver arrived at pickup");
@@ -128,13 +128,15 @@ export default function driver_details() {
 
           if (updated.status === "completed") {
             Alert.alert("Trip Completed", "Hope you enjoyed your ride.");
-            router.push("/(root)/trip_summary?tripId=" + tripId);
+            router.push({
+              pathname: "/(root)/trip_summary",
+              params: { tripId: tripId },
+            });
           }
         }
       )
       .subscribe();
   }, [tripId]);
-
 
   if (loading || !trip) {
     return <Loader message="Loading driver details" />;
@@ -150,20 +152,19 @@ export default function driver_details() {
   };
 
   const getTitle = () => {
-  switch (trip?.status) {
-    case "accepted":
-      return "Driver is on the way";
-    case "arrived":
-      return "Driver has arrived";
-    case "in_progress":
-      return "Trip underway";
-    case "completed":
-      return "Trip completed";
-    default:
-      return "Loading trip...";
-  }
-};
-
+    switch (trip?.status) {
+      case "accepted":
+        return "Driver is on the way";
+      case "arrived":
+        return "Driver has arrived";
+      case "in_progress":
+        return "Trip underway";
+      case "completed":
+        return "Trip completed";
+      default:
+        return "Loading trip...";
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -193,7 +194,9 @@ export default function driver_details() {
         <Text style={styles.title}>{getTitle()}</Text>
 
         <Text style={styles.label}>Driver</Text>
-        <Text style={styles.value}>{driver?.first_name} {driver?.last_name}</Text>
+        <Text style={styles.value}>
+          {driver?.first_name} {driver?.last_name}
+        </Text>
 
         <Text style={styles.label}>Vehicle</Text>
         <Text style={styles.value}>
