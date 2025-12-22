@@ -9,6 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   ScrollView,
+  Image,
 } from "react-native";
 import { supabase } from "../../util/supabase"; // adjust path to your Supabase client
 import EmailField from "../../components/EmailField";
@@ -16,6 +17,9 @@ import PasswordField from "../../components/PasswordField";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import InputField from "../../components/InputField";
+import PrimaryButton from "../../components/PrimaryButton";
+import signUpCar from "../../assets/signup-car.png";
 
 export default function SignupScreen() {
   const [email, setEmail] = useState("");
@@ -46,7 +50,7 @@ export default function SignupScreen() {
     );
 
     setLoading(false);
-    router.replace('/confirm');
+    router.replace("/confirm");
   };
 
   return (
@@ -60,19 +64,22 @@ export default function SignupScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          <View style={styles.imageWrapper}>
+            <Image source={signUpCar} style={styles.logo} />
+          </View>
+          
           <Text style={styles.title}>Rider Signup</Text>
-          <TextInput
-            placeholder="First Name"
+          <InputField
             value={firstName}
             onChangeText={setFirstName}
-            style={styles.input}
+            label="First Name"
           />
-          <TextInput
-            placeholder="Last Name"
+          <InputField
             value={lastName}
             onChangeText={setLastName}
-            style={styles.input}
+            label="Last Name"
           />
+
           <EmailField
             placeholder="Email"
             value={email}
@@ -83,11 +90,14 @@ export default function SignupScreen() {
             value={password}
             onChangeText={setPassword}
           />
-          <Button
+          <PrimaryButton
             title={loading ? "Signing up..." : "Sign Up"}
             onPress={handleSignup}
             disabled={loading}
           />
+          <Text style={styles.link} onPress={() => router.push("signin")}>
+                  Have an account? Sign in →
+                </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -98,20 +108,26 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: "center" },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingBottom: 50, // ensures space for the button
   },
+  imageWrapper: {
+    marginTop: -40,
+    marginHorizontal: -20
+  },
+  logo: {
+    width: "100%",
+    height: 200,
+    marginBottom: 20,
+    alignSelf: "center",
+  },
+
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 5,
-  },
+
+  link: { fontFamily: "JakartaSemiBold", marginTop: 20, color: "#007AFF", textAlign: "center" },
 });

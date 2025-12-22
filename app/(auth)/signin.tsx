@@ -1,6 +1,6 @@
 // app/auth/login.tsx
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { loginandCacheProfile } from "../../services/auth";
@@ -8,6 +8,7 @@ import EmailField from "../../components/EmailField";
 import PasswordField from "../../components/PasswordField";
 import GoogleSignInButton from "../../components/GoogleSignInButton";
 import PrimaryButton from "../../components/PrimaryButton";
+import signUpCar from "../../assets/signup-car.png";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -24,7 +25,11 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🎉 Welcome Back!</Text>
+      <View style={styles.imageWrapper}>
+<Image source={signUpCar} style={styles.logo} />
+      </View>
+      
+      <Text style={styles.title}>Welcome Back!</Text>
       <EmailField value={email} onChangeText={setEmail} />
       <PasswordField value={password} onChangeText={setPassword} />
       <PrimaryButton title={submitting ? "Logging in": "Login"} onPress={handleLogin} disabled={submitting} />
@@ -37,6 +42,16 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: 20, flex: 1, justifyContent: "center" },
+  imageWrapper: {
+    marginTop: -90,
+    marginHorizontal: -20
+  },
+    logo: {
+    width: "100%",
+    height: 300,
+    marginBottom: 20,
+    alignSelf: "center",
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
