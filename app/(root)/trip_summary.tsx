@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Trip } from "../../types/Trip";
 import { Driver } from "../../types/Driver";
 import { Vehicle } from "../../types/Vehicle";
 import { supabase } from "../../util/supabase";
 import Loader from "../../components/Loader";
+import PrimaryButton from "../../components/PrimaryButton";
 
 export default function trip_summary() {
   const { tripId } = useLocalSearchParams();
@@ -66,24 +67,31 @@ export default function trip_summary() {
       setDriver(driverRow);
 
       // 4. Fetch Vehicle
-      const { data: vehicleRow, error: vehicleError } = await supabase.from("vehicles").select("id, make, model, number_plate").eq("id", tripRow.vehicle_id).maybeSingle();
-      if(vehicleError) throw vehicleError
-      setVehicle(vehicleRow)
+      const { data: vehicleRow, error: vehicleError } = await supabase
+        .from("vehicles")
+        .select("id, make, model, number_plate")
+        .eq("id", tripRow.vehicle_id)
+        .maybeSingle();
+      if (vehicleError) throw vehicleError;
+      setVehicle(vehicleRow);
     } catch (error) {
-        console.error("Error fetching trip summary:", err);
+      console.error("Error fetching trip summary:", error);
       Alert.alert("Error", "Could not load trip summary");
-
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if(tripId)fetchTripSummary()
-  }, [tripId])
+  const goHome = async () => {
+    router.push("(tabs)/home")
+  }
 
-  if (loading || !trip){
-    <Loader message="Loading summary..." />
+  useEffect(() => {
+    if (tripId) fetchTripSummary();
+  }, [tripId]);
+
+  if (loading || !trip) {
+    return <Loader message="Loading summary..." />;
   }
   return (
     <View style={styles.container}>
@@ -119,6 +127,7 @@ export default function trip_summary() {
           ? `${vehicle.make} ${vehicle.model} (${vehicle.number_plate})`
           : "Unknown"}
       </Text>
+      <PrimaryButton title="Go Home" onPress={goHome} style={{ padding: 16 }} variant="secondary" />
     </View>
   );
 }
