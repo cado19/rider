@@ -243,7 +243,6 @@ export default function trip_request() {
   }
   return (
     <View style={styles.container}>
-      <Text>trip_request</Text>
       {/* Map  */}
       {origin && (
         <MapView
