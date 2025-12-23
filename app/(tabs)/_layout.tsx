@@ -43,7 +43,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="activities"
         options={{
           title: "Activities",
@@ -52,7 +52,7 @@ export default function TabLayout() {
             <TabIcon name="list" focused={focused} />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="profile"
         options={{

@@ -95,12 +95,21 @@ export default function Home() {
 
   // render item function
   const renderTrip = ({ item }: { item: Trip }) => (
-    <TripCard
-      originName={item.originName}
-      destinationName={item.destinationName}
-      date={item.started_at}
-      fare={item.fare}
-    />
+    <TouchableOpacity
+      onPress={() =>
+        router.push({
+          pathname: "(root)/trip_summary",
+          params: { tripId: item.id.toString() },
+        })
+      }
+    >
+      <TripCard
+        originName={item.originName}
+        destinationName={item.destinationName}
+        date={item.started_at}
+        fare={item.fare}
+      />
+    </TouchableOpacity>
   );
 
   return (
@@ -125,8 +134,7 @@ export default function Home() {
       <Text style={styles.sectionTitle}>Recent Rides</Text>
 
       {loading ? (
-        <Loader message="Loading recent trips"
-        />
+        <Loader message="Loading recent trips" />
       ) : (
         <FlatList
           data={trips}
@@ -183,7 +191,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     paddingHorizontal: 20,
     marginBottom: 10,
-    color: "#374151"
+    color: "#374151",
   },
   emptyText: {
     textAlign: "center",
