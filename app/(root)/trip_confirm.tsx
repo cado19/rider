@@ -14,6 +14,7 @@ import { supabase } from "../../util/supabase";
 import Loader from "../../components/Loader";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
+import PrimaryButton from "../../components/PrimaryButton";
 
 const screen = Dimensions.get("window");
 
@@ -156,27 +157,56 @@ export default function trip_confirm() {
       // 4. Subscribe to trip updates
       const tripSubscription = supabase
         .channel("trip-status")
-        .on("postgres_changes", {
-          event: "UPDATE",
-          schema: "public",
-          table: "trips",
-          filter: `trip_request_id=eq.${tripRequest.id}`
-        }, (payload) => {
-          const updated = payload.new;
-          // console.log(updated);
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "trips",
+            filter: `trip_request_id=eq.${tripRequest.id}`,
+          },
+          (payload) => {
+            const updated = payload.new;
+            // console.log(updated);
 
-          if(updated.status === "accepted"){
-            setSearchMessage("Driver accepted your trip!");
+            if (updated.status === "accepted") {
+              setSearchMessage("Driver accepted your trip!");
 
-            setTimeout(() => {
-              tripSubscription.unsubscribe();
-              router.push({
-                pathname: "(root)/driver_details",
-                params: {tripId: updated.id}
-              })
-            }, 1500)
+              setTimeout(() => {
+                tripSubscription.unsubscribe();
+                router.push({
+                  pathname: "(root)/driver_details",
+                  params: { tripId: updated.id },
+                });
+              }, 1500);
+            }
+
+            if (updated.status === "rejected") {
+              setSearchMessage(
+                "Couldn't find a driver for your trip. Pleasy try again!"
+              );
+
+              setTimeout(() => {
+                tripSubscription.unsubscribe();
+                router.push("(tabs)/home");
+              }, 1500);
+            }
           }
-        }).subscribe();
+        )
+        .subscribe();
+
+      // 5. Timeout fallback in case of no response from driver
+      const timeOutId = setTimeout(async () => {
+        setSearchMessage(
+          "Driver did not respond in time. Kindly request again"
+        );
+        await supabase
+          .from("trips")
+          .update({ status: "rejected" })
+          .eq("trip_request_id", tripRequestId);
+        tripSubscription.unsubscribe();
+        router.push("(tabs)/home");
+      }, 20000);
     } catch (error) {
       console.error(error);
       Alert.alert("Error", "Could not confirm trip");
@@ -265,7 +295,8 @@ export default function trip_confirm() {
 
       {/* Confirm Button */}
       <View style={{ marginBottom: 20 }}>
-        <Button
+        
+        <PrimaryButton
           title={submitting ? "Confirming..." : "Confirm"}
           onPress={handleConfirm}
           disabled={submitting}
@@ -280,7 +311,7 @@ const styles = StyleSheet.create({
   map: { width: screen.width, height: screen.height * 0.4 },
 
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },
-  header: { fontSize: 24, fontWeight: "600", marginBottom: 20, marginTop: 20 },
+  header: { fontSize: 24, fontFamily: "JakartaMedium", marginBottom: 20, marginTop: 20 },
   card: {
     padding: 16,
     borderRadius: 10,
