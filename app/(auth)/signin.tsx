@@ -26,13 +26,17 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.imageWrapper}>
-<Image source={signUpCar} style={styles.logo} />
+        <Image source={signUpCar} style={styles.logo} />
       </View>
-      
+
       <Text style={styles.title}>Welcome Back!</Text>
       <EmailField value={email} onChangeText={setEmail} />
       <PasswordField value={password} onChangeText={setPassword} />
-      <PrimaryButton title={submitting ? "Logging in": "Login"} onPress={handleLogin} disabled={submitting} />
+      <PrimaryButton
+        title={submitting ? "Logging in" : "Login"}
+        onPress={handleLogin}
+        disabled={submitting}
+      />
       <Text style={styles.link} onPress={() => router.push("signup")}>
         New here? Sign up →
       </Text>
@@ -44,9 +48,9 @@ const styles = StyleSheet.create({
   container: { padding: 20, flex: 1, justifyContent: "center" },
   imageWrapper: {
     marginTop: -90,
-    marginHorizontal: -20
+    marginHorizontal: -20,
   },
-    logo: {
+  logo: {
     width: "100%",
     height: 300,
     marginBottom: 20,
@@ -58,5 +62,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
-  link: { fontFamily: "JakartaSemiBold", marginTop: 20, color: "#007AFF", textAlign: "center" },
+  link: {
+    fontFamily: "JakartaSemiBold",
+    marginTop: 20,
+    color: "#007AFF",
+    textAlign: "center",
+  },
 });
