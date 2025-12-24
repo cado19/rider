@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (session) {
           router.replace("/(tabs)/home"); // redirect to in-app flow
         } else {
-          router.replace("/(auth)/signin"); // redirect to auth flow
+          router.replace("/(auth)/welcome"); // redirect to auth flow
         }
       }
     );
