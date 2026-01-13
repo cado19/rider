@@ -26,16 +26,34 @@ export default function SignupScreen() {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [tel, setTel] = useState("");
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
+  const validateTel = (number: string) => {
+    const localPattern = /^0\d{9}$/;
+    const intlPattern = /^\+254\d{9}$/;
+    return localPattern.test(number) || intlPattern.test(number);
+  };
+
   const handleSignup = async () => {
+    if (!validateTel(tel)) {
+      Alert.alert(
+        "Invalid number",
+        "Enter a valid Kenyan phone number (0XXXXXXXXX or +254XXXXXXXXX)."
+      );
+      return;
+    }
+
     setLoading(true);
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: "com.cado19.rider://auth/callback",
+      },
     });
 
     if (authError) {
@@ -46,7 +64,7 @@ export default function SignupScreen() {
 
     await AsyncStorage.setItem(
       "pending_profile",
-      JSON.stringify({ first_name: firstName, last_name: lastName })
+      JSON.stringify({ first_name: firstName, last_name: lastName, tel })
     );
 
     setLoading(false);
@@ -67,7 +85,7 @@ export default function SignupScreen() {
           <View style={styles.imageWrapper}>
             <Image source={signUpCar} style={styles.logo} />
           </View>
-          
+
           <Text style={styles.title}>Rider Signup</Text>
           <InputField
             value={firstName}
@@ -85,6 +103,14 @@ export default function SignupScreen() {
             value={email}
             onChangeText={setEmail}
           />
+
+          <InputField
+            value={tel}
+            onChangeText={setTel}
+            label="Telephone"
+            placeholder="0722123456 or +254722123456"
+          />
+
           <PasswordField
             placeholder="Password"
             value={password}
@@ -96,8 +122,8 @@ export default function SignupScreen() {
             disabled={loading}
           />
           <Text style={styles.link} onPress={() => router.push("signin")}>
-                  Have an account? Sign in →
-                </Text>
+            Have an account? Sign in →
+          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -113,7 +139,7 @@ const styles = StyleSheet.create({
   },
   imageWrapper: {
     marginTop: -40,
-    marginHorizontal: -20
+    marginHorizontal: -20,
   },
   logo: {
     width: "100%",
@@ -129,5 +155,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  link: { fontFamily: "JakartaSemiBold", marginTop: 20, color: "#007AFF", textAlign: "center" },
+  link: {
+    fontFamily: "JakartaSemiBold",
+    marginTop: 20,
+    color: "#007AFF",
+    textAlign: "center",
+  },
 });

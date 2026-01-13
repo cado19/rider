@@ -95,6 +95,12 @@ export default function Profile() {
         onPress={handleLogout}
         style={{ padding: 16 }}
       />
+
+      <PrimaryButton
+        title="Edit Tel"
+        onPress={() => router.replace("(root)/edit_tel")}
+        style={{ padding: 16 }}
+      />
     </View>
   );
 }
