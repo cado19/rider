@@ -17,6 +17,7 @@ type AuthProviderProps = {
 
 type AuthContextType = {
   session: Session | null;
+  userId: string | null;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -24,6 +25,10 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const router = useRouter();
+
+  const userId = session?.user?.id ?? null; // ✅ derive userId
+
+
   const init = async () => {
     const {
       data: { session },
@@ -59,12 +64,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           if (!rider) {
             const cached = await AsyncStorage.getItem("pending_profile");
             if (cached) {
-              const { first_name, last_name } = JSON.parse(cached);
+              const { first_name, last_name, tel } = JSON.parse(cached);
 
               await supabase.from("riders").insert({
                 id: userId,
                 first_name,
                 last_name,
+                tel
               });
 
               await AsyncStorage.removeItem("pending_profile");
@@ -88,7 +94,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
   }, []);
   return (
-    <AuthContext.Provider value={{ session }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ session, userId }}>{children}</AuthContext.Provider>
   );
 };
 
