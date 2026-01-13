@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import PrimaryButton from "../../components/PrimaryButton";
 import onBoarding1 from "../../assets/onboarding1.png";
 import onBoarding2 from "../../assets/onboarding2.png";
-import onBoarding3 from "../../assets/onboarding3.png";
+import onBoarding3 from "../../assets/onboarding4.png";
 // 👇 Define onboarding slides inline (images from assets)
 const onboarding = [
   {
