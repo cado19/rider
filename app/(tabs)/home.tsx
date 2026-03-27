@@ -5,9 +5,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
-  SafeAreaView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+import { SafeAreaListenerProps, SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -54,7 +54,7 @@ export default function Home() {
             .limit(5);
           if (!error) {
             // setTrips(data);
-            console.log(data);
+            // console.log(data);
 
             // Map trips into human readable addresses
             const tripsWithNames = await Promise.all(

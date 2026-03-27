@@ -11,7 +11,7 @@ export default function driver_details() {
 
   const [trip, setTrip] = useState<any>(null);
   const [driver, setDriver] = useState<any>(null);
-  const [vehicle, setVehile] = useState<any>(null);
+  const [vehicle, setVehicle] = useState<any>(null);
   const [driverLocation, setDriverLocation] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -51,7 +51,7 @@ export default function driver_details() {
 
       if (vehicleErr) throw vehicleErr;
       console.log("vehicleRow: ", vehicleRow);
-      setVehile(vehicleRow);
+      setVehicle(vehicleRow);
     } catch (error) {
       console.error("Error loading details", error);
     } finally {

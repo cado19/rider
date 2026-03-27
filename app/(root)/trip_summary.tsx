@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { Trip } from "../../types/Trip";
+import { Rating, Trip } from "../../types/Trip";
 import { Driver } from "../../types/Driver";
 import { Vehicle } from "../../types/Vehicle";
 import { supabase } from "../../util/supabase";
@@ -14,6 +14,7 @@ export default function trip_summary() {
   const [trip, setTrip] = useState<Trip>();
   const [driver, setDriver] = useState<Driver>();
   const [vehicle, setVehicle] = useState<Vehicle>();
+  const [rating, setRating] = useState<Rating>();
   const [loading, setLoading] = useState<boolean>(true);
 
   async function reverseGeoCode(lat: number, lon: number) {
@@ -74,6 +75,15 @@ export default function trip_summary() {
         .maybeSingle();
       if (vehicleError) throw vehicleError;
       setVehicle(vehicleRow);
+
+      // 5. Fetch Rating
+      const { data: ratingRow } = await supabase
+        .from("driver_rating")
+        .select("*")
+        .eq("trip_id", tripId)
+        .maybeSingle();
+
+      setRating(ratingRow);
     } catch (error) {
       console.error("Error fetching trip summary:", error);
       Alert.alert("Error", "Could not load trip summary");
@@ -83,8 +93,8 @@ export default function trip_summary() {
   };
 
   const goHome = async () => {
-    router.push("(tabs)/home")
-  }
+    router.push("(tabs)/home");
+  };
 
   useEffect(() => {
     if (tripId) fetchTripSummary();
@@ -127,7 +137,25 @@ export default function trip_summary() {
           ? `${vehicle.make} ${vehicle.model} (${vehicle.number_plate})`
           : "Unknown"}
       </Text>
-      <PrimaryButton title="Go Home" onPress={goHome} style={{ padding: 16 }} variant="secondary" />
+      {trip.status === "completed" && !rating && (
+        <TouchableOpacity
+          style={[styles.primaryButton, { backgroundColor: "#10B981" }]}
+          onPress={() =>
+            router.push({
+              pathname: "(root)/trip_rating",
+              params: { tripId: trip.id.toString(), driverId: trip.driver_id },
+            })
+          }
+        >
+          <Text style={styles.primaryButtonText}>Rate Driver</Text>
+        </TouchableOpacity>
+      )}
+      <PrimaryButton
+        title="Go Home"
+        onPress={goHome}
+        style={{ padding: 16 }}
+        variant="secondary"
+      />
     </View>
   );
 }
@@ -153,5 +181,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 4,
     color: "#111827",
+  },
+  primaryButton: {
+    backgroundColor: "#007AFF",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  primaryButtonText: {
+    color: "#fff",
+    fontFamily: "JakartaSemiBold",
+    fontSize: 16,
   },
 });

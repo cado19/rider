@@ -12,3 +12,13 @@ export interface Trip {
   ended_at: string | null;
   created_at: string | null;
 }
+
+export interface Rating {
+    id: string;
+    trip_id: string;
+    rider_user_id: string;
+    driver_user_id: string;
+    rating: number;
+    comment?: string;
+    created_at?: string;
+}
