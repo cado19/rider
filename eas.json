@@ -10,14 +10,42 @@
       },
       "ios": {
         "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "@env:EXPO_PUBLIC_SUPABASE_URL",
+        "EXPO_PUBLIC_ANON": "@env:EXPO_PUBLIC_ANON",
+        "EXPO_PUBLIC_REDIRECT_URL": "@env:EXPO_PUBLIC_REDIRECT_URL",
+        "EXPO_PUBLIC_WEB_CLIENT_ID": "@env:EXPO_PUBLIC_WEB_CLIENT_ID",
+        "EXPO_PUBLIC_GOOGLE_MAPS_KEY_ANDROID": "@env:EXPO_PUBLIC_GOOGLE_MAPS_KEY_ANDROID",
+        "EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB": "@env:EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB"
       }
     },
     "preview": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "@env:EXPO_PUBLIC_SUPABASE_URL",
+        "EXPO_PUBLIC_ANON": "@env:EXPO_PUBLIC_ANON",
+        "EXPO_PUBLIC_REDIRECT_URL": "@env:EXPO_PUBLIC_REDIRECT_URL",
+        "EXPO_PUBLIC_WEB_CLIENT_ID": "@env:EXPO_PUBLIC_WEB_CLIENT_ID",
+        "EXPO_PUBLIC_GOOGLE_MAPS_KEY_ANDROID": "@env:EXPO_PUBLIC_GOOGLE_MAPS_KEY_ANDROID",
+        "EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB": "@env:EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB"
       }
     },
-    "production": {}
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "@env:EXPO_PUBLIC_SUPABASE_URL",
+        "EXPO_PUBLIC_ANON": "@env:EXPO_PUBLIC_ANON",
+        "EXPO_PUBLIC_REDIRECT_URL": "@env:EXPO_PUBLIC_REDIRECT_URL",
+        "EXPO_PUBLIC_WEB_CLIENT_ID": "@env:EXPO_PUBLIC_WEB_CLIENT_ID",
+        "EXPO_PUBLIC_GOOGLE_MAPS_KEY_ANDROID": "@env:EXPO_PUBLIC_GOOGLE_MAPS_KEY_ANDROID",
+        "EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB": "@env:EXPO_PUBLIC_GOOGLE_MAPS_KEY_WEB"
+      }
+    }
   },
   "submit": {
     "production": {}
