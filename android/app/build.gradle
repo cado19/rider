@@ -152,31 +152,67 @@ android {
     }
 }
 
+// dependencies {
+//     // The version of react-native is set by the React Native Gradle Plugin
+//     implementation("com.facebook.react:react-android")
+
+//     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
+//     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
+//     def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";
+
+//     if (isGifEnabled) {
+//         // For animated gif support
+//         implementation("com.facebook.fresco:animated-gif:${expoLibs.versions.fresco.get()}")
+//     }
+
+//     if (isWebpEnabled) {
+//         // For webp support
+//         implementation("com.facebook.fresco:webpsupport:${expoLibs.versions.fresco.get()}")
+//         if (isWebpAnimatedEnabled) {
+//             // Animated webp support
+//             implementation("com.facebook.fresco:animated-webp:${expoLibs.versions.fresco.get()}")
+//         }
+//     }
+
+//     if (hermesEnabled.toBoolean()) {
+//         implementation("com.facebook.react:hermes-android")
+//     } else {
+//         implementation jscFlavor
+//     }
+// }
 dependencies {
-    // The version of react-native is set by the React Native Gradle Plugin
+    // Core React Native
     implementation("com.facebook.react:react-android")
 
-    def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
-    def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
-    def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";
-
-    if (isGifEnabled) {
-        // For animated gif support
-        implementation("com.facebook.fresco:animated-gif:${expoLibs.versions.fresco.get()}")
-    }
-
-    if (isWebpEnabled) {
-        // For webp support
-        implementation("com.facebook.fresco:webpsupport:${expoLibs.versions.fresco.get()}")
-        if (isWebpAnimatedEnabled) {
-            // Animated webp support
-            implementation("com.facebook.fresco:animated-webp:${expoLibs.versions.fresco.get()}")
-        }
-    }
-
+    // Hermes or JSC
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
     }
+
+    // Fresco image formats (optional, controlled by expo.gif/webp flags)
+    def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
+    def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
+    def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";
+
+    if (isGifEnabled) {
+        implementation("com.facebook.fresco:animated-gif:${expoLibs.versions.fresco.get()}")
+    }
+
+    if (isWebpEnabled) {
+        implementation("com.facebook.fresco:webpsupport:${expoLibs.versions.fresco.get()}")
+        if (isWebpAnimatedEnabled) {
+            implementation("com.facebook.fresco:animated-webp:${expoLibs.versions.fresco.get()}")
+        }
+    }
+
+    // ✅ Community/native modules
+    implementation project(':react-native-async-storage_async-storage')
+    implementation project(':react-native-google-signin_google-signin')
+    implementation project(':react-native-maps')
+    implementation 'com.google.android.gms:play-services-base:18.5.0'
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    implementation project(':react-native-safe-area-context')
+    implementation project(':react-native-screens')
 }
