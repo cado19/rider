@@ -5,6 +5,11 @@ import { AuthProvider } from '../context/AuthProvider'
 import { useFonts } from "expo-font";
 
 export default function _layout() {
+  console.log("Supabase URL:", process.env.EXPO_PUBLIC_SUPABASE_URL);
+  console.log("Anon Key:", process.env.EXPO_PUBLIC_ANON);
+  console.log("Maps Key:", process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY_ANDROID);
+
+
   const [fontsLoaded] = useFonts({
     JakartaRegular: require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
     JakartaMedium: require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
