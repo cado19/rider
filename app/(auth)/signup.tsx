@@ -52,7 +52,7 @@ export default function SignupScreen() {
       email,
       password,
       options: {
-        emailRedirectTo: "com.cado19.rider://auth/callback",
+        emailRedirectTo: "com.cado19.rider://callback",
       },
     });
 
