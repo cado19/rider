@@ -28,6 +28,7 @@ const screen = Dimensions.get("window");
 export default function trip_request() {
   const [origin, setOrigin] = useState<Coordinates | null>(null); // WHERE THE RIDER IS GETTING PICKED
   const [destination, setDestination] = useState<Coordinates | null>(null); // WHERE THE RIDER IS GOING
+  const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false); // for when a user submitting
   const [routeCoords, setRouteCoords] = useState<Coordinates[]>([]);
@@ -36,9 +37,8 @@ export default function trip_request() {
   const mapRef = useRef(null);
 
   // get the current location of the rider
-  const detectLocation = async () => {
+  const detectLocation = async (profile) => {
     const { status } = await Location.requestForegroundPermissionsAsync();
-    const profile = await fetchRiderProfile();
     const userId = profile?.id;
 
     if (status != "granted") {
@@ -53,7 +53,7 @@ export default function trip_request() {
     };
 
     setOrigin(coords);
-    console.log("Detected origin:", coords);
+    // console.log("Detected origin:", coords);
 
     // save to rider profile
     await supabase
@@ -164,7 +164,7 @@ export default function trip_request() {
         console.warn("No route found: ", data);
         Alert.alert(
           "Route Error",
-          "No route could be found between origin and destination."
+          "No route could be found between origin and destination.",
         );
       }
     } catch (error) {
@@ -177,7 +177,7 @@ export default function trip_request() {
     if (!origin || !destination || !distance || !duration) {
       Alert.alert(
         "Missing Info",
-        "Please select a destination and wait for route to load."
+        "Please select a destination and wait for route to load.",
       );
       return;
     }
@@ -185,12 +185,13 @@ export default function trip_request() {
     setRequesting(true);
 
     try {
-      const profile = await fetchRiderProfile();
+      // const profile = await fetchRiderProfile();
+      // console.log("profile_details: ", profile);
       const riderId = profile?.id;
 
       const distanceKm = parseFloat(distance.replace(" km", ""));
       const durationMin = parseFloat(
-        duration.replace(" mins", "").replace(" min", "")
+        duration.replace(" mins", "").replace(" min", ""),
       );
 
       const { data, error } = await supabase
@@ -223,10 +224,23 @@ export default function trip_request() {
   };
 
   useEffect(() => {
-    detectLocation().finally(() => {
-      setLoading(false);
-    });
+    const init = async () => {
+      try {
+        const riderProfile = await fetchRiderProfile();
+        setProfile(riderProfile);
+        await detectLocation(riderProfile); // pass profile in
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
   }, []);
+
+  // useEffect(() => {
+  //   detectLocation().finally(() => {
+  //     setLoading(false);
+  //   });
+  // }, []);
 
   useEffect(() => {
     zoomMap();
@@ -243,6 +257,15 @@ export default function trip_request() {
   }
   return (
     <View style={styles.container}>
+      {/* Back Button */}
+      <View style={styles.backButtonWrapper}>
+        <Ionicons
+          name="arrow-back"
+          size={28}
+          color="#007AFF"
+          onPress={() => router.replace("/(tabs)/home")}
+        />
+      </View>
       {/* Map  */}
       {origin && (
         <MapView
@@ -348,6 +371,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F9FAFB",
   },
+  backButtonWrapper: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    zIndex: 20,
+    backgroundColor: "#FFF",
+    borderRadius: 20,
+    padding: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
   loadingContainer: {
     justifyContent: "center",
     alignItems: "center",
@@ -359,7 +395,7 @@ const styles = StyleSheet.create({
   },
   searchBox: {
     position: "absolute",
-    top: 40,
+    top: 90,
     width: screen.width - 40,
     marginHorizontal: 20,
     zIndex: 10,
