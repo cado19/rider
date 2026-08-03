@@ -13,16 +13,23 @@ import signUpCar from "../../assets/signup-car.png";
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
 
   const handleLogin = async () => {
     setSubmitting(true);
-    const { profile, session } = await loginandCacheProfile(email, password);
-    router.replace("/(tabs)/home");
+    setError(null);
+    try {
+      const { profile, session } = await loginandCacheProfile(email, password);
+      router.replace("/(tabs)/home");
+    } catch (err: any) {
+      setError(err.message); // shows "Incorrect email/password combination"
+    } finally {
+      setSubmitting(false);
+    }
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.imageWrapper}>
@@ -32,6 +39,7 @@ export default function LoginScreen() {
       <Text style={styles.title}>Welcome Back!</Text>
       <EmailField value={email} onChangeText={setEmail} />
       <PasswordField value={password} onChangeText={setPassword} />
+      {error && <Text style={styles.error}>{error}</Text>}
       <PrimaryButton
         title={submitting ? "Logging in" : "Login"}
         onPress={handleLogin}
@@ -62,6 +70,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
+  error: { color: "#FF3B30", marginTop: 10, textAlign: "center" },
   link: {
     fontFamily: "JakartaSemiBold",
     marginTop: 20,
