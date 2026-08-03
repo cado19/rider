@@ -14,7 +14,7 @@ export async function loginandCacheProfile(email: string, password: string) {
   // fetch profile information from profiles table
   const { data: profile, error: profileError } = await supabase
     .from("riders")
-    .select("*")
+    .select("id, first_name, last_name, tel")
     .eq("id", session.user.id);
   if (profileError) throw profileError;
 
